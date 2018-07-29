@@ -10,7 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "chart.js": "^2.7.2"
+    "chart.js": "^2.7.2",
+    "mosyrejs2": "^1.0.0"
   },
   "devDependencies": {
     "live-server": "^1.2.0"
