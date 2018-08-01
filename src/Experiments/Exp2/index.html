@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>x->0.5x + 1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="content/chart.js/Chart.bundle.min.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="../content/bootstrap4/css/bootstrap.min.css" />
+    <script src="/content/jquery/jquery-3.3.1.min.js"></script>
+    <script src="/content/bootstrap4/js/bootstrap.bundle.min.js"></script>
+
+
+    <script src="/content/chart.js/Chart.bundle.min.js"></script>
+    <script src="/content/mosyrejs2/mosyrejs2.min.js"></script>
+    <script src="/content/JS/Iterator.js"></script>
+    <script src="/content/JS/IteratorChart.js"></script>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <canvas id="CHART" style="width:100%;height:500px"></canvas>
+
+        <form>
+            <div class="input-group mb-3">
+                Iteration: x->0.5x + 1
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Seed</span>
+                </div>
+                <input id="seed" type="number" class="form-control" value="0">
+            </div>
+            <button type="button" id="start" class="btn btn-info mr-3">Start</button>
+            <button type="button" id="stop" disabled class="btn btn-danger">Stop</button>
+            <button type="button" id="clearchart" class="btn btn-secondary">Clear Chart</button>
+        </form>
+    </div>
+    <script>
+        let {
+            RClay,
+            Conduit
+        } = mosyrejs2;
+        
+        let form = new RClay({
+            init(clay) {
+                let agg = clay.agreement;
+                let center = clay.center;
+                let start = $("#start");
+                let stop = $("#stop")
+                let seed = $("#seed");
+
+
+                start.click(function () {
+                    $(this).prop("disabled", true);
+                    stop.prop("disabled", false);
+                    center.SEED = seed.val();
+                    center.FLOW = true;
+                })
+
+                stop.click(function () {
+                    $(this).prop("disabled", true);
+                    start.prop("disabled", false);
+                    center.FLOW = false;
+                })
+            }
+        })
+
+        let iter = new RClay({
+            sensorPoints: ["IN"],
+            response(center) {
+                center.OUT = center.IN * 0.5 + 1;
+            }
+        })
+
+        let collector = new RClay({
+            sensorPoints: ["IN", "ENABLE"],
+            data: [],
+            i: 0,
+            timer: null,
+            response(center, clay) {
+                if (center.ENABLE) {
+                    clay.agreement.timer = setTimeout(() => {
+                        let data = clay.agreement.data;
+                        let p = {
+                            x: clay.agreement.i++,
+                            y: center.IN
+                        }
+                        data.push(p);
+                        center.POINT = p;
+                        center.NEXT = center.IN
+                    }, 200)
+                } else {
+                    clay.agreement.data = [];
+                    clay.agreement.i = 0;
+                    clearTimeout(clay.agreement.timer);
+                    clay.agreement.timer = null;
+                }
+            }
+        })
+
+        let chartClay = new RClay({
+            sensorPoints: ["DATA", ],
+            init: function (clay) {
+                let agg = clay.agreement
+                agg.chart = new Chart(ctx, {
+                    type: 'scatter',
+                    options: {
+                        scales: {
+                            xAxes: [{
+                                type: 'linear',
+                                position: 'bottom'
+                            }]
+                        },
+                        animation:{
+                            duration:100
+                        }
+                    },
+                    data: {                       
+                        datasets:[{
+                            data:[],                            
+                            backgroundColor:"#FF0000"
+                        }]
+                    }
+                })
+
+                let clearchart = $("#clearchart");
+
+                clearchart.click(() => {
+                    agg.chart.data.datasets[0].data = [];
+                    agg.chart.update(0);
+                })
+            },
+            response(center, clay) {
+                let agg = clay.agreement;
+                agg.chart.data.datasets[0].data.push(center.DATA);
+                agg.chart.update(0);
+            }
+        })
+
+        Conduit.createLink([collector, "NEXT", iter, "IN"])
+        Conduit.createLink([form, "SEED", collector, "IN", iter, "OUT"])
+        Conduit.createLink([form, "FLOW", collector, "ENABLE"])
+        Conduit.createLink([chartClay, "DATA", collector, "POINT"])
+    </script>
+</body>
+
+</html>
