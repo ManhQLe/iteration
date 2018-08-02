@@ -45,7 +45,8 @@ class IteratorChart extends mosyrejs2.RClay {
             idx >= 0 ? (chart.data.datasets[idx].data = s.data) :
                 chart.data.datasets.push({
                     label: s.iname,
-                    data: s.data
+                    data: s.data,
+                    backgroundColor:s.backgroundColor
                 })
 
             chart.update();
