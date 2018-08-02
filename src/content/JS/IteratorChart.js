@@ -1,8 +1,7 @@
-class IterChart extends RClay {
+class IteratorChart extends mosyrejs2.RClay {
     constructor(agr) {
         super(agr)
         this.agreement.sensorPoints = ["IN", "RESET"]
-        this.agreement.staged = true;
         let ctx = document.getElementById(this.agreement.canvas).getContext("2d");
         this.defineAgreement("chart", new Chart(ctx, {
             type: 'scatter',
@@ -37,10 +36,12 @@ class IterChart extends RClay {
         if (reset) {
             chart.data.datasets = [];
             center.RESET = null;
+            return;
         }
         if (s) {
-            let idx = chart.data.datasets.findIdex(ds => ds.label === s.iname);
 
+            let idx = chart.data.datasets.findIndex(ds => ds.label === s.iname);
+            
             idx >= 0 ? (chart.data.datasets[idx].data = s.data) :
                 chart.data.datasets.push({
                     label: s.iname,

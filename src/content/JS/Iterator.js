@@ -1,17 +1,16 @@
-class Iterator extends RClay {
+class Iterator extends mosyrejs2.RClay {
     constructor(agr){
         super(agr)        
         this.agreement.sensorPoints = ["SPEC"]
     }
 
     onResponse(){
-        let agr = this.agreement;
         let center = this.center;
         let {seed,n,fx} = center.SPEC;        
-        let data =[s];        
+        let data =[seed];        
         for(let i = 0;i<n;i++){
-            s = fx(s)
-            data.push(s)
+            seed = fx(seed)
+            data.push(seed)
         }
 
         center.OUT = data;
