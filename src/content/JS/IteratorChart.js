@@ -35,14 +35,15 @@ class IteratorChart extends mosyrejs2.RClay {
 
         if (reset) {
             chart.data.datasets = [];
-            center.RESET = null;
+            this.setSensorPoint("RESET",false);
+            chart.update();
             return;
         }
         if (s) {
 
             let idx = chart.data.datasets.findIndex(ds => ds.label === s.iname);
-            
-            idx >= 0 ? (chart.data.datasets[idx].data = s.data) :
+            let f = null;
+            idx >= 0 ? (f = chart.data.datasets[idx], f.data = s.data,f.backgroundColor = s.backgroundColor) :
                 chart.data.datasets.push({
                     label: s.iname,
                     data: s.data,
