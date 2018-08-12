@@ -20,20 +20,17 @@
     <script src="/content/chart.js/Chart.bundle.min.js"></script>
     <script src="/content/mosyrejs2/mosyrejs2.min.js"></script>
     <script src="/content/d3/d3.v5.min.js"></script>
-    <script src="/content/ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/content/ace/ace.js" type="text/javascript" charset="utf-8"></script>
 </head>
 
 <body>
-    <script type="text/x-mathjax-config">
-        MathJax.Hub.Config({ tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]} });
-    </script>
 
     <div class="container-fluid">
         <table class="table table-bordered" id="FXTABLE">
             <thead>
                 <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Name</th>
+                    <th scope="col" style="width: 1%">#</th>
+                    <th scope="col" style="width: 200px">Name</th>
                     <th scope="col">fx</th>
                 </tr>
             </thead>
@@ -46,15 +43,35 @@
     <script>
         var fxs = [{
                 name: "x \\rightarrow x^2",
-                fx: "x=>{return x*x}"
+                fxText: "x=>{return x*x}"
             },
             {
                 name: "x \\rightarrow 0.5x+1",
-                fx: "x=>{return 0.5*x+1}"
+                fxText: "x=>{return 0.5*x+1}"
             }
         ]
 
-        d3.select("#FXTABLE")
+        d3.select("#FXTABLE > tbody").selectAll("tr")        
+        .data(fxs)
+        .enter()
+        .append("tr")
+        .each(function(d) {   
+            let d3this = d3.select(this);
+            d3this.append("td").append("input").attr("type","checkbox")
+           
+            katex.render(d.name,d3this.append("td").node()) 
+            
+            let code = d3this.append("td").append("div")
+            .style("height","100px")
+            
+            code.text(d.fxText)
+            let editor = ace.edit(code.node(),{})            
+            editor.setTheme("ace/theme/monokai");
+            editor.getSession().setMode("ace/mode/javascript");            
+
+            
+        })
+
     </script>
 </body>
 
