@@ -8,18 +8,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="/content/chart.js/Chart.bundle.min.js"></script>
     <link rel="stylesheet" type="text/css" media="screen" href="/content/bootstrap4/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="/content/katex/katex.css" />
+
 
     <script src="/content/jquery/jquery-3.3.1.min.js"></script>
     <script src="/content/bootstrap4/js/bootstrap.bundle.min.js"></script>
     <script src="/content/iro/iro.min.js"></script>
 
+    <script src="/content/katex/katex.min.js"></script>
+
     <script src="/content/chart.js/Chart.bundle.min.js"></script>
     <script src="/content/mosyrejs2/mosyrejs2.min.js"></script>
-    <script src="/content/mathjax/mathjax.2.7.5.min.js"></script>
     <script src="/content/d3/d3.v5.min.js"></script>
+    <script src="/content/ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 </head>
 
 <body>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({ tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]} });
+    </script>
+
     <div class="container-fluid">
         <table class="table table-bordered" id="FXTABLE">
             <thead>
@@ -32,19 +40,21 @@
             <tbody>
             </tbody>
         </table>
-        <p>
-                When \(a \ne 0\), there are two solutions to \(ax^2 + bx + c = 0\) and they are
-                $$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$
-              </p>
+        <p id="Text">
+        </p>
     </div>
     <script>
-        var fxs=[{
-            name:"x->x*x",
-
-        }]
+        var fxs = [{
+                name: "x \\rightarrow x^2",
+                fx: "x=>{return x*x}"
+            },
+            {
+                name: "x \\rightarrow 0.5x+1",
+                fx: "x=>{return 0.5*x+1}"
+            }
+        ]
 
         d3.select("#FXTABLE")
-
     </script>
 </body>
 
