@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>CUBE ROOT(x)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="/content/chart.js/Chart.bundle.min.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="/content/bootstrap4/css/bootstrap.min.css" />
+
+    <script src="/content/jquery/jquery-3.3.1.min.js"></script>
+    <script src="/content/bootstrap4/js/bootstrap.bundle.min.js"></script>
+    <script src="/content/iro/iro.min.js"></script>
+
+    <script src="/content/chart.js/Chart.bundle.min.js"></script>
+    <script src="/content/mosyrejs2/mosyrejs2.min.js"></script>
+    <script src="/content/JS/Iterator.js"></script>
+    <script src="/content/JS/IteratorChart.js"></script>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <canvas id="CHART" style="width:100%;height:500px"></canvas>
+        <form>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Iteration</span>
+                        </div>
+                        <input id="iteration" type="number" class="form-control" value="30">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Seed</span>
+                        </div>
+                        <input id="seed" type="number" class="form-control" value="0">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Square Of</span>
+                        </div>
+                        <input id="cube" type="number" class="form-control" value="5">
+                    </div>
+                    <button type="button" id="start" class="btn btn-info mr-3">Send</button>
+                    <button type="button" id="clearchart" class="btn btn-secondary">Clear Chart</button>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Color</span>
+                        </div>
+                        <div id="color"></div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script>
+        let {
+            RClay,
+            Conduit
+        } = mosyrejs2;
+
+        let form = new RClay({
+            init(clay) {
+                let agg = clay.agreement;
+                let center = clay.center;
+                let start = $("#start");
+                let seed = $("#seed");
+                let iter = $("#iteration");
+                let square = $("#cube");
+                start.click(function () {
+                    center.OUT = {
+                        seed: parseFloat(seed.val()),
+                        n: parseInt(iter.val()),
+                        fx: eval(`(function(x){ return 0.5*(x+${square.val()}/(x*x)) })`)
+                    }
+                    center.SEEDINFO = seed.val();
+                    center.CLEAR = false;
+                })
+
+                $("#clearchart").click(() => {
+                    center.CLEAR = true;
+                })
+            }
+        })
+
+        let iter = new Iterator()
+
+        let composer = new RClay({
+            staged: true,
+            sensorPoints: ["SERIES", "SEED"],
+            init(clay) {
+                let agr = clay.agreement;
+                agr.colorCtrl = new iro.ColorPicker("#color", {
+                    width: 256,
+                    height: 256,
+                    color:"#FF0000"
+                });
+            },
+            response(center, clay) {
+                let data = center.SERIES;
+                let seed = center.SEED;
+                let agr = clay.agreement;
+                center.OUT = {
+                    data: data.map((d, i) => {
+                        return {
+                            x: i,
+                            y: d
+                        }
+                    }),
+                    iname: "Seed " + seed,
+                    backgroundColor: agr.colorCtrl.color.hexString
+                }
+            }
+        })
+
+        let chart = new IteratorChart({
+            "canvas": "CHART"
+        })
+
+        Conduit.createLink([form, "OUT", iter, "SPEC"])
+        Conduit.createLink([form, "CLEAR", chart, "RESET"])
+        Conduit.createLink([form, "SEEDINFO", composer, "SEED"])
+        Conduit.createLink([composer, "SERIES", iter, "OUT"])
+        Conduit.createLink([composer, "OUT", chart, "IN"])
+    </script>
+</body>
+
+</html>

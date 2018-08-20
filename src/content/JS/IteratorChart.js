@@ -36,6 +36,7 @@ class IteratorChart extends mosyrejs2.RClay {
         if (reset) {
             chart.data.datasets = [];
             this.setSensorPoint("RESET",false);
+            this.setSensorPoint("IN",undefined);
             chart.update();
             return;
         }
